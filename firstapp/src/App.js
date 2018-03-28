@@ -1,18 +1,32 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
-import './App.css';
+import styles from './App.css';
+import {Input} from 'antd';
+import {observer} from 'mobx-react'
 
+@observer
 class App extends Component {
+  onBthClick(){
+    console.log('sadasd');
+    this.props.store.generate1()
+  }
+  onBthClick2(){
+    // console.log('dasd',);
+  }
+  // componentDidMount(){
+  //   setInterval(()=>{
+  //     this.forceUpdate()
+  //   },1000);
+  // }
   render() {
+    console.log('123',this.props.store.index)
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <Input value={this.props.store.generate} />
+
+        <button onClick={this.onBthClick.bind(this)}>  123</button>
+
+        <button onClick={this.onBthClick2.bind(this)}>  123</button>
       </div>
     );
   }
