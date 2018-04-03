@@ -1,0 +1,8 @@
+.navTimeline:hover {
+    text-shadow: 0 0 5px black;
+}
+
+.navTimeline {
+    text-shadow: 0 0 0px black;
+    transition: text-shadow .3s ease; 
+}

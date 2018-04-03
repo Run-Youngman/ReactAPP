@@ -1,23 +1,43 @@
-import {observable,computed,action} from 'mobx'
+import { observable, action, computed, useStrict } from 'mobx';
+import FileMap from './articlesHelper/fileMap.json';
 
-class Mob {
-    @observable index = 0;
-    @observable obj = {};
-
-    @computed get generate(){
-        console.log('computed');
-        return ;
+let allPaths = getAllpath(FileMap);
+const FILE_MAP = observable(FileMap);
+class Store {
+    @observable currentTag = null;
+    @observable displayMode = 'normal';
+    @computed get FileMap() {
+        return FILE_MAP;
     }
-    @action.bound generate1(){
-        this.index ++;
+    @computed get FileMapCount() {
+        console.log('get count');
+        return Object.keys(FILE_MAP).reduce(((prev, current) => {
+            prev[current] = Object.keys(FILE_MAP[current]).length;
+            return prev;
+        }), {});
+    }
+
+    @action.bound changeTag(tag) {
+        this.currentTag = tag;
+    }
+    @action.bound triggerDisplayModeNormal() {
+        this.displayMode = 'normal';
     }
 }
-class Mob2 {
-    get asd(){
-        console.log('sadasd');
-        return 123
+
+function getAllpath(fmap) {
+    let paths = [];
+    function getPath(obj, currentpath) {
+        if (typeof obj !== 'object') {
+            paths.push(currentpath);
+            return;
+        }
+        Object.keys(obj).map(key => {
+            getPath(obj[key], currentpath + '/' + key);
+        });
     }
+    getPath(fmap, './articles');
+    return paths;
 }
 
-export const store = new Mob;
-export const store2 = new Mob2;
+export default new Store();
