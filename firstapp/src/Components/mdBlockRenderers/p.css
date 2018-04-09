@@ -1,0 +1,12 @@
+.mdp {
+    padding: 5px;
+    font-size: 0.9rem;
+    border: 1px dotted #fff;
+    background: #f8f8f8;
+    line-height: 1.4em;
+}
+
+.mdp:hover {
+    border: 1px solid #ccc;
+    transition: .5s border;
+}

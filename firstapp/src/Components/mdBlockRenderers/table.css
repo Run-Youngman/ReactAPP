@@ -1,0 +1,30 @@
+.mdtable thead{
+    background: #486f8e;
+    font-size: 1.2em;
+    color: papayawhip;
+}
+.mdtable table{
+    margin: 10px;
+    background: #335875;
+}
+.mdtable tbody tr:nth-child(2n){
+    background: #d5e2ef;
+}
+.mdtable tbody tr:nth-child(2n-1){
+    background: #dcdada;
+}
+/* .mdtable th{
+    background: #d5e2ef;
+} */
+.mdtable table{
+    border: 1px solid silver;
+}
+.mdtable th{
+    padding: 5px 5px 5px;
+}
+.mdtable td{
+    padding: 3px;
+}
+.mdtable td:hover{
+    background: rosybrown;
+}

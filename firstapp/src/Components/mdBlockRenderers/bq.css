@@ -1,0 +1,9 @@
+.bq {
+    padding-left: 10px;
+    border-left: 3px solid #adadad;
+    color: #adadad;
+    margin: 10px 0 10px 0;
+}
+.bq p{
+    background: #fff;
+}

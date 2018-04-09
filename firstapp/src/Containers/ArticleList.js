@@ -14,7 +14,7 @@ export default class extends Component {
 
     componentDidMount(){
         if(this.props.tag){
-            this.getArticles(this.porps);
+            this.getArticles(this.props);
         }
     }
     componentWillReceiveProps(p1){
@@ -24,6 +24,7 @@ export default class extends Component {
     }
     getArticles(props){
         let articleData = [];
+        debugger
         Object.keys(this.props.fileMap[props.tag]).map(articleName => {
             let helper = require('../articles/'+ props.tag + '/' + articleName);
             let basicInfo = helper.getBasicInfo();

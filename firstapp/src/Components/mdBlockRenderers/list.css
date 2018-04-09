@@ -1,0 +1,22 @@
+.mdList ol {
+    /* background: #dfe2e5; */
+    list-style-type: decimal;
+}
+
+.mdList ul {
+    /* background: #dfe2e5; */
+    list-style-type: circle
+}
+
+.mdList {
+    border: 1px solid #dfe2e5;
+    padding: 0 10px 0;
+}
+
+.mdList li {
+    margin: 10px;
+    border-bottom: 1px solid #dedede;
+}
+.mdList li:last-child{
+    border-bottom: 0;
+}
