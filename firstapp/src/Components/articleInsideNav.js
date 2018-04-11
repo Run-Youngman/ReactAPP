@@ -12,7 +12,6 @@ export default class extends Component {
     componentDidMount(){
         let ele = this.props.getElement();
         //ele md的父元素 children[0]代表的是md文件 的html 表达  children 是md的内容
-        debugger
         let tags = ele.children[0].children;
         let Hs = [];
         // App.js文件中的div元素，这里是dom元素的操作

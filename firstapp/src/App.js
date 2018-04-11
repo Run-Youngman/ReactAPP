@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import stylesLess from './App2.less';
+import stylesLess from './App.less';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import  {Button, Menu } from 'antd';
 import Nav from './Components/Nav';
