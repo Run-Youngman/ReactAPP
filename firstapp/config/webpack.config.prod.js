@@ -1,5 +1,5 @@
 'use strict';
-//生产模式，在yarn build中生效
+
 const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
@@ -8,12 +8,11 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
-// const eslintFormatter = require('react-dev-utils/eslintFormatter');
+const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
 const publicPath = paths.servedPath;
@@ -28,7 +27,8 @@ const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
 const publicUrl = publicPath.slice(0, -1);
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl);
-
+const blogs = require('./blogs');
+console.log(blogs);
 // Assert this just to be safe.
 // Development builds of React are slow and not intended for production.
 if (env.stringified['process.env'].NODE_ENV !== '"production"') {
@@ -44,7 +44,7 @@ const cssFilename = 'static/css/[name].[contenthash:8].css';
 // To have this structure working with relative paths, we have to use custom options.
 const extractTextPluginOptions = shouldUseRelativeAssetPaths
   ? // Making sure that the publicPath goes back to to build folder.
-    { publicPath: Array(cssFilename.split('/').length).join('../') }
+  { publicPath: Array(cssFilename.split('/').length).join('../') }
   : {};
 
 // This is the production configuration.
@@ -57,7 +57,10 @@ module.exports = {
   // You can exclude the *.map files from the build during deployment.
   devtool: shouldUseSourceMap ? 'source-map' : false,
   // In production, we only want to load the polyfills and the app code.
-  entry: [require.resolve('./polyfills'), paths.appIndexJs],
+  entry: {
+    app: [require.resolve('./polyfills'), paths.appIndexJs],
+    ...blogs
+  },
   output: {
     // The build folder.
     path: paths.appBuild,
@@ -89,9 +92,9 @@ module.exports = {
     // https://github.com/facebookincubator/create-react-app/issues/290
     // `web` extension prefixes have been added for better support
     // for React Native Web.
-    extensions: ['.web.js', '.mjs', '.js', '.json', '.web.jsx', '.jsx'],
+    extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx'],
     alias: {
-      
+      'SRC': paths.appSrc,
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
@@ -114,21 +117,6 @@ module.exports = {
 
       // First, run the linter.
       // It's important to do this before Babel processes the JS.
-      // {
-      //   test: /\.(js|jsx|mjs)$/,
-      //   enforce: 'pre',
-      //   use: [
-      //     {
-      //       options: {
-      //         formatter: eslintFormatter,
-      //         eslintPath: require.resolve('eslint'),
-              
-      //       },
-      //       loader: require.resolve('eslint-loader'),
-      //     },
-      //   ],
-      //   include: paths.appSrc,
-      // },
       {
         // "oneOf" will traverse all following loaders until one will
         // match the requirements. When no loader matches it will fall
@@ -141,17 +129,17 @@ module.exports = {
             test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
             loader: require.resolve('url-loader'),
             options: {
-              limit: 10000,   //超过这个大小，单独存为一个文件
+              limit: 10000,
               name: 'static/media/[name].[hash:8].[ext]',
             },
           },
           // Process JS with Babel.
           {
-            test: /\.(js|jsx|mjs)$/,
+            test: /\.(js|jsx)$/,
             include: paths.appSrc,
             loader: require.resolve('babel-loader'),
             options: {
-              
+
               // This is a feature of `babel-loader` for webpack (not Babel itself).
               // It enables caching results in ./node_modules/.cache/babel-loader/
               // directory for faster rebuilds.
@@ -163,152 +151,118 @@ module.exports = {
           // "style" loader turns CSS into JS modules that inject <style> tags.
           // In production, we use a plugin to extract that CSS to a file, but
           // in development "style" loader enables hot editing of CSS.
-          // {
-          //   test: /\.css$/,
-          //   //include:paths.appSrc,  //
-          //   use:[
-          //     require.resolve('style-loader'),
-          //     {
-          //       loader: require.resolve('css-loader'),
-          //       options: {
-          //         importLoaders: 1,
-          //       },
-          //     },
-          //     {
-          //       loader: require.resolve('postcss-loader'),
-          //       options: {
-          //         // Necessary for external CSS imports to work
-          //         // https://github.com/facebookincubator/create-react-app/issues/2677
-          //         ident: 'postcss',
-          //         plugins: () => [
-          //           require('postcss-flexbugs-fixes'),
-          //           autoprefixer({
-          //             browsers: [
-          //               '>1%',
-          //               'last 4 versions',
-          //               'Firefox ESR',
-          //               'not ie < 9', // React doesn't support IE8 anyway
-          //             ],
-          //             flexbox: 'no-2009',
-          //           }),
-          //         ],
-          //       },
-          //     },
-          //   ],
-          // },
           {
-						test: /\.css$/,
-						include: paths.appSrc,   //antd以及node_modules中的库，不支持样式模块化
-						use: ExtractTextPlugin.extract({
-							fallback: "style-loader",   //最后一个执行
-							use: [
-								{
-									loader: require.resolve('css-loader'),
-									options: {
-										importLoaders: 1,
-										modules: true,   //开启模块化
-										localIdentName: '[name]_css_[local]--[hash:base64:5]'
-									},
-								},
-								{
-									loader: require.resolve('postcss-loader'),
-									options: {
-										// Necessary for external CSS imports to work
-										// https://github.com/facebookincubator/create-react-app/issues/2677
-										ident: 'postcss',
-										plugins: () => [
-											require('postcss-flexbugs-fixes'),
-											autoprefixer({
-												browsers: [
-													'>1%',
-													'last 4 versions',
-													'Firefox ESR',
-													'not ie < 9', // React doesn't support IE8 anyway
-												],
-												flexbox: 'no-2009',
-											}),
-										],
-									}
-								}
-							],
-							publicPath: 'css/'
-						})
+            test: /\.css$/,
+            include: paths.appSrc,
+            use: ExtractTextPlugin.extract({
+              fallback: "style-loader",
+              use: [
+                {
+                  loader: require.resolve('css-loader'),
+                  options: {
+                    importLoaders: 1,
+                    modules: true,
+                    localIdentName: '[name]_css_[local]--[hash:base64:5]'
+                  },
+                },
+                {
+                  loader: require.resolve('postcss-loader'),
+                  options: {
+                    // Necessary for external CSS imports to work
+                    // https://github.com/facebookincubator/create-react-app/issues/2677
+                    ident: 'postcss',
+                    plugins: () => [
+                      require('postcss-flexbugs-fixes'),
+                      autoprefixer({
+                        browsers: [
+                          '>1%',
+                          'last 4 versions',
+                          'Firefox ESR',
+                          'not ie < 9', // React doesn't support IE8 anyway
+                        ],
+                        flexbox: 'no-2009',
+                      }),
+                    ],
+                  }
+                }
+              ],
+              publicPath: 'css/'
+            })
+
           },
           {
-						test: /\.less$/,
-						include: paths.appSrc,
-						use: ExtractTextPlugin.extract({
-							fallback: "style-loader",
-							use: [
-								{
-									loader: require.resolve('css-loader'),
-									options: {
-										importLoaders: 1,
-										modules: true,
-										localIdentName: '[name]_less_[local]--[hash:base64:5]'
-									},
-								},
-								{
-									loader: require.resolve('postcss-loader'),
-									options: {
-										// Necessary for external CSS imports to work
-										// https://github.com/facebookincubator/create-react-app/issues/2677
-										ident: 'postcss',
-										plugins: () => [
-											require('postcss-flexbugs-fixes'),
-											autoprefixer({
-												browsers: [
-													'>1%',
-													'last 4 versions',
-													'Firefox ESR',
-													'not ie < 9', // React doesn't support IE8 anyway
-												],
-												flexbox: 'no-2009',
-											}),
-										],
-									}
-								},
-								require.resolve('less-loader'),    //将less变成css
-							],
-							publicPath: 'css/'
-						})
+            test: /\.less$/,
+            include: paths.appSrc,
+            use: ExtractTextPlugin.extract({
+              fallback: "style-loader",
+              use: [
+                {
+                  loader: require.resolve('css-loader'),
+                  options: {
+                    importLoaders: 1,
+                    modules: true,
+                    localIdentName: '[name]_less_[local]--[hash:base64:5]'
+                  },
+                },
+                {
+                  loader: require.resolve('postcss-loader'),
+                  options: {
+                    // Necessary for external CSS imports to work
+                    // https://github.com/facebookincubator/create-react-app/issues/2677
+                    ident: 'postcss',
+                    plugins: () => [
+                      require('postcss-flexbugs-fixes'),
+                      autoprefixer({
+                        browsers: [
+                          '>1%',
+                          'last 4 versions',
+                          'Firefox ESR',
+                          'not ie < 9', // React doesn't support IE8 anyway
+                        ],
+                        flexbox: 'no-2009',
+                      }),
+                    ],
+                  }
+                },
+                require.resolve('less-loader'),
+              ],
+              publicPath: 'css/'
+            })
           },
           {
-						test: /\.css$/,
-						include: paths.appNodeModules,   //将node中不加module打包
-						use: [
-							'style-loader',
-							'css-loader',
-						]
-					},
+            test: /\.css$/,
+            include: paths.appNodeModules,
+            use: [
+              'style-loader',
+              'css-loader',
+            ]
+          },
           // "file" loader makes sure those assets get served by WebpackDevServer.
           // When you `import` an asset, you get its (virtual) filename.
           // In production, they would get copied to the `build` folder.
           // This loader doesn't use a "test" so it will catch all modules
           // that fall through the other loaders.
           {
-						// Exclude `js` files to keep "css" loader working as it injects
-						// it's runtime that would otherwise processed through "file" loader.
-						// Also exclude `html` and `json` extensions so they get processed
-						// by webpacks internal loaders.
-						exclude: [/\.js$/, /\.html$/, /\.json$/, /\.md$/],//这里把 raw loader给屏蔽了，所以才不起作用
-						loader: require.resolve('file-loader'),
-						options: {
-							name: 'static/media/[name].[hash:8].[ext]',
-						},
-					},
-					{
-						exclude:paths.appNodeModules,   //将文件转换成字符串
-						test: /\.md$/,
-						use: [
-							'raw-loader'
-						],
-					},
-          // ** STOP ** Are you adding a new loader?
-          // Make sure to add the new loader(s) before the "file" loader.
-        ],
-      },
-    ],
+            // Exclude `js` files to keep "css" loader working as it injects
+            // it's runtime that would otherwise processed through "file" loader.
+            // Also exclude `html` and `json` extensions so they get processed
+            // by webpacks internal loaders.
+            exclude: [/\.js$/, /\.html$/, /\.json$/, /\.md$/],//这里把 raw loader给屏蔽了，所以才不起作用
+            loader: require.resolve('file-loader'),
+            options: {
+              name: 'static/media/[name].[hash:8].[ext]',
+            },
+          },
+          {
+            exclude: paths.appNodeModules,
+            test: /\.md$/,
+            use: [
+              'raw-loader'
+            ]
+          }
+        ]
+      }
+    ]
   },
   plugins: [
     // Makes some environment variables available in index.html.
@@ -339,8 +293,8 @@ module.exports = {
     // It is absolutely essential that NODE_ENV was set to production here.
     // Otherwise React will be compiled in the very slow development mode.
     new webpack.DefinePlugin(env.stringified),
-    // Minify the code.
     new UglifyJsPlugin({ sourceMap: false }),
+    // Minify the code.
     // new webpack.optimize.UglifyJsPlugin({
     //   compress: {
     //     warnings: false,
@@ -350,16 +304,13 @@ module.exports = {
     //     // https://github.com/mishoo/UglifyJS2/issues/2011
     //     comparisons: false,
     //   },
-    //   mangle: {
-    //     safari10: true,
-    //   },
     //   output: {
     //     comments: false,
     //     // Turned on because emoji and regex is not minified properly using default
     //     // https://github.com/facebookincubator/create-react-app/issues/2488
     //     ascii_only: true,
     //   },
-    //   sourceMap: shouldUseSourceMap,
+    //   sourceMap: false,
     // }),
     // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
     new ExtractTextPlugin({
@@ -370,6 +321,9 @@ module.exports = {
     // having to parse `index.html`.
     new ManifestPlugin({
       fileName: 'asset-manifest.json',
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      names: Object.keys(blogs) // 指定一个希望作为公共包的入口
     }),
     // Generate a service worker script that will precache, and keep up to date,
     // the HTML & assets that are part of the Webpack build.
